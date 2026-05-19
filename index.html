@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-logo">
+      <div class="navbar-logo-icon">🎵</div>
+      <span>Sonore</span>
+    </a>
+    <nav>
+      <a href="index.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="artists.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Artistes
+      </a>
+      <a href="albums.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+        Albums
+      </a>
+      <a href="tracks.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Tracks
+      </a>
+    </nav>
+  </nav>
+
+  <!-- PAGE -->
+  <div class="page">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="eyebrow">Tableau de bord</div>
+        <h1>Salut <span class="highlight" id="usernameTitle">Vyrdox</span></h1>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="usernameInput" placeholder="Vyrdox" value="Vyrdox">
+        <button onclick="loadDashboard()">Charger</button>
+      </div>
+    </div>
+
+    <!-- PROFILE CARD -->
+    <div class="profile-card">
+      <div class="profile-info">
+        <div class="profile-avatar-placeholder">🎧</div>
+        <div class="profile-meta">
+          <div class="label">Profil</div>
+          <h2 id="profileName">Vyrdox</h2>
+          <div class="profile-sub">
+            France · Depuis 2026 · <span class="accent" id="scrobbles">0</span> scrobbles
+          </div>
+        </div>
+      </div>
+      <div class="now-playing-card" id="nowPlayingCard" style="display:none">
+        <img class="now-playing-cover" id="nowPlayingCover" src="" alt="">
+        <div>
+          <div class="now-playing-label">En écoute</div>
+          <div class="now-playing-title" id="nowPlayingTitle">—</div>
+          <div class="now-playing-artist" id="nowPlayingArtist">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERIOD FILTERS -->
+    <div class="period-filters">
+      <button class="period-btn" onclick="setPeriod('7day', this)">7 jours</button>
+      <button class="period-btn active" onclick="setPeriod('1month', this)">1 mois</button>
+      <button class="period-btn" onclick="setPeriod('3month', this)">3 mois</button>
+      <button class="period-btn" onclick="setPeriod('6month', this)">6 mois</button>
+      <button class="period-btn" onclick="setPeriod('12month', this)">1 an</button>
+      <button class="period-btn" onclick="setPeriod('overall', this)">Toujours</button>
+    </div>
+
+    <!-- STATS GRID -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div class="stat-label">Scrobbles</div>
+          <div class="stat-icon">🎵</div>
+        </div>
+        <div class="stat-value" id="statScrobbles">—</div>
+        <div class="stat-sub">Total all-time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div class="stat-label">Temps écouté</div>
+          <div class="stat-icon">🕐</div>
+        </div>
+        <div class="stat-value" id="statTime">—</div>
+        <div class="stat-sub">Estimation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div class="stat-label">Top Artiste</div>
+          <div class="stat-icon">🎤</div>
+        </div>
+        <div class="stat-value gradient" id="statArtist" style="font-size:1.6rem">—</div>
+        <div class="stat-sub" id="statArtistPlays">— écoutes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div class="stat-label">Obsession</div>
+          <div class="stat-icon">🎶</div>
+        </div>
+        <div class="stat-value gradient" id="statTrack" style="font-size:1.6rem">—</div>
+        <div class="stat-sub" id="statTrackArtist">—</div>
+      </div>
+    </div>
+
+    <!-- TOP ARTISTES -->
+    <div class="section-header">
+      <div>
+        <h2><span class="icon">🎤</span> Top Artistes</h2>
+        <div class="sub">Tes obsessions du moment</div>
+      </div>
+      <a href="artists.html" class="see-all">Tout voir ›</a>
+    </div>
+    <div class="artists-grid" id="artistsGrid"></div>
+
+    <!-- TWO COLS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:40px">
+
+      <!-- RECENTLY PLAYED -->
+      <div class="card">
+        <h2>Recently Played</h2>
+        <div id="recentTracks"></div>
+      </div>
+
+      <!-- TOP 5 -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="card">
+          <h2>Top 5 Artistes</h2>
+          <div id="topArtistsList"></div>
+        </div>
+        <div class="card">
+          <h2>Top 5 Tracks</h2>
+          <div id="topTracksList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="card" style="max-width:400px;margin:0 auto 40px">
+      <h2>Top Artistes</h2>
+      <div class="chart-container">
+        <canvas id="artistChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    let currentPeriod = '1month';
+
+    function setPeriod(period, btn) {
+      currentPeriod = period;
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // reload data with new period if needed
+    }
+
+    function loadDashboard() {
+      const input = document.getElementById('usernameInput').value.trim();
+      if (!input) return;
+      document.getElementById('usernameTitle').textContent = input;
+      document.getElementById('profileName').textContent = input;
+      // trigger reload — for now just reload page with new user
+      window.location.href = window.location.pathname + '?user=' + encodeURIComponent(input);
+    }
+
+    // Now playing detection from recent tracks
+    document.addEventListener('DOMContentLoaded', () => {
+      const apiKey = "c6b9d9ad368f30cf24c6fc909a750af3";
+      const username = "Vyrdox";
+
+      // Estimated time from scrobbles
+      fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=${apiKey}&format=json`)
+        .then(r => r.json())
+        .then(data => {
+          const plays = Number(data.user.playcount);
+          document.getElementById('scrobbles').textContent = plays.toLocaleString();
+          document.getElementById('statScrobbles').textContent = plays.toLocaleString();
+          // avg 3.5 min per track
+          const mins = Math.round(plays * 3.5);
+          const h = Math.floor(mins / 60);
+          const m = mins % 60;
+          document.getElementById('statTime').textContent = `${h}h ${m}m`;
+        });
+
+      // Recent tracks + now playing
+      fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${apiKey}&format=json&limit=1`)
+        .then(r => r.json())
+        .then(data => {
+          const track = data.recenttracks.track[0];
+          if (track['@attr'] && track['@attr'].nowplaying === 'true') {
+            document.getElementById('nowPlayingCard').style.display = 'flex';
+            document.getElementById('nowPlayingTitle').textContent = track.name;
+            document.getElementById('nowPlayingArtist').textContent = track.artist['#text'];
+            const img = track.image[2]['#text'];
+            if (img) document.getElementById('nowPlayingCover').src = img;
+          }
+        });
+    });
+  </script>
+</body>
+</html>
